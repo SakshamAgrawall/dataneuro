@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import './App.css'
-import {ADD_DATA, GETDATA, GET_SINGLE_DATA, UPDATE_DATA} from './apiLink'
+import {ADD_DATA, GETDATA, GET_COUNT, GET_SINGLE_DATA, UPDATE_DATA} from './apiLink'
 import axios from 'axios';
 
 function App() {
   const [data,setData]=useState();
+  const [count,setCount]=useState();
   const [add,setAdd] = useState(false);
   const [edit,setEdit] = useState(false);
   const [name,setName]=useState('');
@@ -35,6 +36,7 @@ const addData=async()=>{
       aboutMe:aboutMe
     })
     if(res.status===200){
+      fetchCount()
       setAdd(false);
       window.alert(res.data.message)
       setAboutMe(null);
@@ -57,6 +59,7 @@ const editData=async(id)=>{
       aboutMe:aboutMe
     })
     if(res.status===200){
+      fetchCount()
       window.alert(res.data.message)
       setEdit(false);
       fetchData();
@@ -84,13 +87,29 @@ setAboutMe(res.data.getData[0].aboutMe)
   }
   };
 
+  const fetchCount=async()=>{
+    try {
+      const res = await axios.get(GET_COUNT())
+      if(res?.status===200){
+        setCount(res.data)
+      }  
+   } catch (error) {
+     console.log(error)
+   }
+  }
 
   useEffect(()=>{
     fetchData()
   },[]);
 
+  useEffect(()=>{
+    fetchCount()
+  },[]);
 
-return(<>
+
+return(
+  <>
+<div>
   {!add&& !edit&&<div className="headingContainer">
     <h1 className='heading'>DATA</h1>
     <button className='button' onClick={()=>setAdd(true)}>ADD+</button>
@@ -141,7 +160,17 @@ return(<>
 </div>
   
   </div>}
-</>)
+</div>
+<div>
+<div className="data">
+      <p>ADD API COUNT={count?.add_count}</p>
+      <p>UPDATE API COUNT={count?.update_count}</p>
+      
+      
+     </div>
+</div>
+</>
+)
 }
 
 export default App;
